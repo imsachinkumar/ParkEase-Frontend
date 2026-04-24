@@ -1,0 +1,102 @@
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="logo">ParkEase</div>
+    <nav>
+      <a routerLink="/driver/dashboard" class="nav-item">Dashboard</a>
+      <a routerLink="/driver/search"    class="nav-item active">Find Parking</a>
+      <a routerLink="/driver/bookings"  class="nav-item">My Bookings</a>
+      <a routerLink="/driver/vehicles"  class="nav-item">My Vehicles</a>
+      <a routerLink="#"                 class="nav-item">Notifications</a>
+      <a routerLink="#"                 class="nav-item">Profile</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="avatar">S</div>
+        <div>
+          <div class="user-name">Sachin</div>
+          <div class="user-role">Driver</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-header">
+      <h2>Find Parking</h2>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="search-bar">
+      <input type="text" [(ngModel)]="searchCity"
+             placeholder="Enter city or address..."
+             (keyup.enter)="onSearch()"/>
+      <label class="ev-label">
+        <input type="checkbox" [(ngModel)]="showEVOnly"/> EV Only
+      </label>
+      <button (click)="onSearch()">Search</button>
+    </div>
+
+    <!-- QUICK SEARCH -->
+    <div class="quick-links">
+      <span>Quick:</span>
+      <button (click)="quickSearch('Agra')">Agra</button>
+      <button (click)="quickSearch('Mathura')">Mathura</button>
+      <button (click)="quickSearch('Delhi')">Delhi</button>
+    </div>
+
+    <!-- EMPTY (before search) -->
+    <div *ngIf="!isSearched" class="empty">
+      <p>Search for a city or area to see available parking lots.</p>
+    </div>
+
+    <!-- NO RESULTS -->
+    <div *ngIf="isSearched && filteredLots.length === 0" class="empty">
+      <p>No parking lots found. Try a different search.</p>
+    </div>
+
+    <!-- RESULTS -->
+    <div *ngIf="isSearched && filteredLots.length > 0">
+      <div class="results-count">{{ filteredLots.length }} lots found for "{{ searchCity }}"</div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Parking Lot</th>
+            <th>Address</th>
+            <th>Available</th>
+            <th>Price</th>
+            <th>Rating</th>
+            <th>EV</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let lot of filteredLots">
+            <td><strong>{{ lot.name }}</strong></td>
+            <td class="muted">{{ lot.address }}, {{ lot.city }}</td>
+            <td>{{ lot.available }} / {{ lot.total }}</td>
+            <td>₹{{ lot.price }}/hr</td>
+            <td>{{ lot.rating }}</td>
+            <td>{{ lot.hasEV ? 'Yes' : '—' }}</td>
+            <td>
+              <span class="badge"
+                [class.badge-open]="lot.status === 'Open'"
+                [class.badge-full]="lot.status === 'Full'">
+                {{ lot.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-book" [disabled]="lot.available === 0">
+                {{ lot.available === 0 ? 'Full' : 'Book' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>

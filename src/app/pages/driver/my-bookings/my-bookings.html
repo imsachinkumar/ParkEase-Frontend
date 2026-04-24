@@ -1,0 +1,109 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/driver/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/driver/search" class="nav-item">Find Parking</a>
+        <a routerLink="/driver/bookings" class="nav-item active">My Bookings</a>
+        <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
+        <a routerLink="#" class="nav-item">Notifications</a>
+        <a routerLink="#" class="nav-item">Profile</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">S</div>
+        <div>
+          <div class="user-name">Sachin</div>
+          <div class="user-role">Driver</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>My Bookings</h1>
+      <a routerLink="/driver/search" class="btn-primary">+ New Booking</a>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab === 'ALL'"
+              (click)="setTab('ALL')">All</button>
+      <button class="tab" [class.active]="activeTab === 'ACTIVE'"
+              (click)="setTab('ACTIVE')">Active</button>
+      <button class="tab" [class.active]="activeTab === 'COMPLETED'"
+              (click)="setTab('COMPLETED')">Completed</button>
+      <button class="tab" [class.active]="activeTab === 'CANCELLED'"
+              (click)="setTab('CANCELLED')">Cancelled</button>
+    </div>
+
+    <!-- BOOKINGS TABLE -->
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Parking Lot</th>
+            <th>Spot</th>
+            <th>Vehicle</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of filteredBookings">
+            <td class="id-col">{{ b.id }}</td>
+            <td>{{ b.lot }}</td>
+            <td>{{ b.spot }}</td>
+            <td class="id-col">{{ b.vehicle }}</td>
+            <td>{{ b.date }}</td>
+            <td>{{ b.startTime }} - {{ b.endTime }}</td>
+            <td><strong>{{ b.amount }}</strong></td>
+            <td>
+              <span class="badge"
+                    [class.active]="b.status === 'ACTIVE'"
+                    [class.completed]="b.status === 'COMPLETED'"
+                    [class.cancelled]="b.status === 'CANCELLED'">
+                {{ b.status }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm blue"
+                        *ngIf="b.status === 'ACTIVE'">
+                  Check In
+                </button>
+                <button class="btn-sm red"
+                        *ngIf="b.status === 'ACTIVE'">
+                  Cancel
+                </button>
+                <button class="btn-sm grey"
+                        *ngIf="b.status === 'COMPLETED'">
+                  Receipt
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- EMPTY STATE -->
+      <div class="empty" *ngIf="filteredBookings.length === 0">
+        <p>No {{ activeTab.toLowerCase() }} bookings found.</p>
+        <a routerLink="/driver/search" class="btn-primary">Find Parking</a>
+      </div>
+    </div>
+
+  </main>
+</div>

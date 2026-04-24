@@ -1,0 +1,172 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/admin/dashboard" class="nav-item active">Dashboard</a>
+        <a routerLink="#" class="nav-item">Manage Users</a>
+        <a routerLink="#" class="nav-item">Manage Lots</a>
+        <a routerLink="#" class="nav-item">All Bookings</a>
+        <a routerLink="#" class="nav-item">Payments</a>
+        <a routerLink="#" class="nav-item">Analytics</a>
+        <a routerLink="#" class="nav-item">Notifications</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">A</div>
+        <div>
+          <div class="user-name">{{ adminName }}</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Admin Dashboard</h1>
+      <button class="btn-primary">Send Notification</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card" *ngFor="let stat of stats">
+        <div class="stat-value">{{ stat.value }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+      </div>
+    </div>
+
+    <!-- PENDING LOT APPROVALS -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Pending Lot Approvals</h2>
+        <span class="pending-count">{{ pendingLots.length }} pending</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Lot ID</th>
+            <th>Lot Name</th>
+            <th>Manager</th>
+            <th>City</th>
+            <th>Spots</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let lot of pendingLots">
+            <td class="id-col">{{ lot.id }}</td>
+            <td><strong>{{ lot.name }}</strong></td>
+            <td>{{ lot.manager }}</td>
+            <td>{{ lot.city }}</td>
+            <td>{{ lot.spots }}</td>
+            <td>{{ lot.date }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-approve" (click)="approveLot(lot)">
+                  Approve
+                </button>
+                <button class="btn-reject" (click)="rejectLot(lot)">
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- RECENT USERS -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Recent Users</h2>
+        <a href="#" class="view-all">View all</a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of recentUsers">
+            <td class="id-col">{{ user.id }}</td>
+            <td><strong>{{ user.name }}</strong></td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge"
+                    [class.driver]="user.role === 'DRIVER'"
+                    [class.manager]="user.role === 'MANAGER'">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>{{ user.date }}</td>
+            <td>
+              <span class="badge"
+                    [class.active]="user.status === 'ACTIVE'"
+                    [class.suspended]="user.status === 'SUSPENDED'">
+                {{ user.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-toggle" (click)="suspendUser(user)">
+                {{ user.status === 'ACTIVE' ? 'Suspend' : 'Activate' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- RECENT BOOKINGS -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Recent Bookings</h2>
+        <a href="#" class="view-all">View all</a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Parking Lot</th>
+            <th>Driver</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of recentBookings">
+            <td class="id-col">{{ b.id }}</td>
+            <td>{{ b.lot }}</td>
+            <td>{{ b.driver }}</td>
+            <td>{{ b.date }}</td>
+            <td>{{ b.amount }}</td>
+            <td>
+              <span class="badge"
+                    [class.active]="b.status === 'ACTIVE'"
+                    [class.completed]="b.status === 'COMPLETED'"
+                    [class.cancelled]="b.status === 'CANCELLED'">
+                {{ b.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>

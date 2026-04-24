@@ -1,0 +1,80 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/driver/dashboard" class="nav-item active">Dashboard</a>
+        <a routerLink="/driver/search" class="nav-item">Find Parking</a>
+        <a routerLink="/driver/bookings" class="nav-item">My Bookings</a>
+        <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
+        <a routerLink="#" class="nav-item">Notifications</a>
+        <a routerLink="#" class="nav-item">Profile</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ driverName[0] }}</div>
+        <div>
+          <div class="user-name">{{ driverName }}</div>
+          <div class="user-role">Driver</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <a routerLink="/driver/search" class="btn-primary">+ Find Parking</a>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card" *ngFor="let stat of stats">
+        <div class="stat-value">{{ stat.value }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+      </div>
+    </div>
+
+    <!-- RECENT BOOKINGS -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Recent Bookings</h2>
+        <a routerLink="/driver/bookings" class="view-all">View all</a>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Parking Lot</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of recentBookings">
+            <td class="booking-id">{{ b.id }}</td>
+            <td>{{ b.lot }}</td>
+            <td>{{ b.date }}</td>
+            <td>{{ b.amount }}</td>
+            <td>
+              <span class="badge"
+                    [class.active]="b.status === 'ACTIVE'"
+                    [class.completed]="b.status === 'COMPLETED'"
+                    [class.cancelled]="b.status === 'CANCELLED'">
+                {{ b.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
