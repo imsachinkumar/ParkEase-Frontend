@@ -11,34 +11,36 @@
     <div class="form">
 
       <div class="form-group">
-        <label>Full Name *</label>
-        <input type="text" [(ngModel)]="name" placeholder="Sachin Kumar"/>
+        <label for="input_7606">Full Name *</label>
+        <input id="input_7606" type="text" [(ngModel)]="name" placeholder="Sachin Kumar"/>
       </div>
 
       <div class="form-group">
-        <label>Email *</label>
-        <input type="email" [(ngModel)]="email" placeholder="you@example.com"/>
+        <label for="input_9135">Email *</label>
+        <input id="input_9135" type="email" [(ngModel)]="email" placeholder="you@example.com"/>
       </div>
 
       <div class="form-group">
-        <label>Phone</label>
-        <input type="tel" [(ngModel)]="phone" placeholder="+91 98765 43210"/>
+        <label for="input_1287">Phone</label>
+        <input id="input_1287" type="tel" [(ngModel)]="phone" placeholder="+91 98765 43210"/>
       </div>
 
       <div class="form-group">
-        <label>Password *</label>
-        <input type="password" [(ngModel)]="password" placeholder="Min 8 characters"/>
+        <label for="input_8752">Password *</label>
+        <input id="input_8752" type="password" [(ngModel)]="password" placeholder="Min 8 characters"/>
       </div>
 
       <div class="form-group">
-        <label>Register as</label>
-        <select [(ngModel)]="role">
+        <label for="input_5604">Register as</label>
+        <select id="input_5604" [(ngModel)]="role">
           <option value="DRIVER">Driver</option>
-          <option value="LOT_MANAGER">Lot Manager</option>
+          <option value="MANAGER">Lot Manager</option>
         </select>
       </div>
 
-      <button class="btn-primary" (click)="onRegister()">Create Account</button>
+      <button class="btn-primary" (click)="onRegister()">
+        {{ isLoading ? 'Creating...' : 'Create Account' }}
+      </button>
 
       <p class="bottom-link">
         Already have an account? <a routerLink="/login">Sign In</a>

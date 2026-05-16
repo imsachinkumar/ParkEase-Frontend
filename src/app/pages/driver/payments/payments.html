@@ -1,0 +1,103 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/driver/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/driver/search" class="nav-item">Find Parking</a>
+        <a routerLink="/driver/bookings" class="nav-item">My Bookings</a>
+        <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
+        <a routerLink="/driver/payments" class="nav-item active">Payments</a>
+        
+        <a routerLink="/driver/notifications" class="nav-item">Notifications</a>
+        <a routerLink="/driver/profile" class="nav-item">Profile</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ driverName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ driverName }}</div>
+          <div class="user-role">Driver</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>My Payments</h1>
+      <button class="btn-refresh" (click)="loadPayments()">🔄 Refresh</button>
+    </div>
+
+    <!-- STATUS FILTER -->
+    <div class="filter-row">
+      <button
+        *ngFor="let s of statuses"
+        class="filter-btn"
+        [class.active]="selectedStatus === s"
+        (click)="filterByStatus(s)">
+        {{ s }}
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" *ngIf="isLoading">Loading payments...</div>
+
+    <!-- TABLE -->
+    <div class="card" *ngIf="!isLoading">
+      <div class="card-header">
+        <h2>Payment History</h2>
+        <span class="count">{{ filteredPayments.length }} records</span>
+      </div>
+
+      <table *ngIf="filteredPayments.length > 0">
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Booking ID</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Transaction ID</th>
+            <th>Status</th>
+            <th>Paid At</th>
+            <th>Created At</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filteredPayments">
+            <td class="id-col">#{{ p.paymentId }}</td>
+            <td class="id-col">Booking #{{ p.bookingId }}</td>
+            <td><strong>₹{{ p.amount }}</strong></td>
+            <td>
+              <span class="badge method">{{ p.paymentMethod }}</span>
+            </td>
+            <td class="txn-col">{{ p.transactionId || '—' }}</td>
+            <td>
+              <span class="badge"
+                [class.success]="p.status === 'SUCCESS'"
+                [class.pending]="p.status === 'PENDING'"
+                [class.failed]="p.status === 'FAILED'"
+                [class.refunded]="p.status === 'REFUNDED'">
+                {{ p.status }}
+              </span>
+            </td>
+            <td>{{ p.paidAtFormatted }}</td>
+            <td>{{ p.createdAtFormatted }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty" *ngIf="filteredPayments.length === 0">
+        <p>No payments found.</p>
+        <a routerLink="/driver/search" class="btn-primary">Find Parking</a>
+      </div>
+    </div>
+
+  </main>
+</div>

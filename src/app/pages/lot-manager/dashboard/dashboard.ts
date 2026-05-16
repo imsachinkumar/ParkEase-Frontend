@@ -1,43 +1,73 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink,RouterLinkActive } from '@angular/router';
+import { ApiService } from '../../../services/api';
+import { AuthService } from '../../../services/auth';
+
+
 
 @Component({
   selector: 'app-lot-manager-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink,RouterLinkActive ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class LotManagerDashboardComponent {
-  managerName = 'Rahul';
+export class LotManagerDashboardComponent implements OnInit {
+  managerName = '';
 
   stats = [
-    { label: 'Total Lots', value: '3' },
-    { label: 'Active Bookings', value: '18' },
-    { label: "Today's Revenue", value: '₹2,840' },
-    { label: 'Total Spots', value: '210' }
+    { label: 'Total Lots', value: '0' },
+    { label: 'Active Bookings', value: '0' },
+    { label: "Today's Revenue", value: '₹0' },
+    { label: 'Total Spots', value: '0' }
   ];
 
-  myLots = [
-    { id: 1, name: 'City Center Parking', address: 'MG Road, Agra',
-      totalSpots: 50, availableSpots: 23, status: 'OPEN' },
-    { id: 2, name: 'Station Road Parking', address: 'Near Railway Station, Agra',
-      totalSpots: 80, availableSpots: 5, status: 'OPEN' },
-    { id: 3, name: 'Mall Parking Complex', address: 'Phoenix Mall, Agra',
-      totalSpots: 80, availableSpots: 40, status: 'CLOSED' },
-  ];
+  myLots: any[] = [];
+  recentBookings: any[] = [];
 
-  recentBookings = [
-    { id: 'BK-101', lot: 'City Center Parking', driver: 'Sachin K.',
-      date: '23 Apr 2024', amount: '₹60', status: 'ACTIVE' },
-    { id: 'BK-102', lot: 'Station Road Parking', driver: 'Amit S.',
-      date: '22 Apr 2024', amount: '₹40', status: 'ACTIVE' },
-    { id: 'BK-103', lot: 'City Center Parking', driver: 'Priya M.',
-      date: '21 Apr 2024', amount: '₹30', status: 'COMPLETED' },
-    { id: 'BK-104', lot: 'Mall Parking Complex', driver: 'Raj P.',
-      date: '20 Apr 2024', amount: '₹40', status: 'COMPLETED' },
-  ];
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    const user = this.authService.getCurrentUser();
+    this.managerName = user?.fullName || user?.name || 'Manager';
+    this.loadDashboardData();
+  }
+
+  loadDashboardData() {
+    const userId = this.authService.getUserId();
+
+    // Lots load karo
+    this.apiService.getAllLots().subscribe({
+      next: (res) => {
+        const allLots = res.data || [];
+        // Manager ke lots filter karo
+        this.myLots = allLots.filter((lot: any) => lot.ownerId === userId || lot.managerId === userId);
+        this.stats[0].value = this.myLots.length.toString();
+        const totalSpots = this.myLots.reduce((sum: number, lot: any) => sum + (lot.totalSpots || 0), 0);
+        this.stats[3].value = totalSpots.toString();
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+
+    // Bookings load karo
+    this.apiService.getMyBookings(userId).subscribe({
+      next: (res) => {
+        const bookings = res.data || [];
+        const active = bookings.filter((b: any) =>
+          b.status === 'CONFIRMED' || b.status === 'ACTIVE').length;
+        this.stats[1].value = active.toString();
+        this.recentBookings = bookings.slice(0, 4);
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
 
   toggleLotStatus(lot: any) {
     lot.status = lot.status === 'OPEN' ? 'CLOSED' : 'OPEN';

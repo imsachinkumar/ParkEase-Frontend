@@ -1,0 +1,153 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/manager/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/manager/lots" class="nav-item">My Lots</a>
+        <a routerLink="/manager/spots" class="nav-item">Manage Spots</a>
+        <a routerLink="/manager/bookings" class="nav-item">Bookings</a>
+        <a routerLink="/manager/revenue" class="nav-item active">Revenue</a>
+        <a routerLink="/manager/profile" class="nav-item">Profile</a>
+
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ managerName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ managerName }}</div>
+          <div class="user-role">Lot Manager</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Revenue</h1>
+      <button class="btn-refresh" (click)="loadRevenue()">🔄 Refresh</button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" *ngIf="isLoading">Loading revenue data...</div>
+
+    <div *ngIf="!isLoading">
+
+      <!-- STATS CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-value">₹{{ totalRevenue }}</div>
+          <div class="stat-sub">From successful payments</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Successful Payments</div>
+          <div class="stat-value">{{ successPayments }}</div>
+          <div class="stat-sub">Completed transactions</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Pending Payments</div>
+          <div class="stat-value">{{ pendingPayments }}</div>
+          <div class="stat-sub">Awaiting completion</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Failed Payments</div>
+          <div class="stat-value">{{ failedPayments }}</div>
+          <div class="stat-sub">Unsuccessful transactions</div>
+        </div>
+      </div>
+
+      <!-- PAYMENT METHOD BREAKDOWN -->
+      <div class="card">
+        <h2>Payment Method Breakdown</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Payment Method</th>
+              <th>Transactions</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="method-badge">UPI</span></td>
+              <td>{{ getMethodCount('UPI') }}</td>
+              <td><strong>₹{{ getMethodRevenue('UPI') }}</strong></td>
+            </tr>
+            <tr>
+              <td><span class="method-badge">CARD</span></td>
+              <td>{{ getMethodCount('CARD') }}</td>
+              <td><strong>₹{{ getMethodRevenue('CARD') }}</strong></td>
+            </tr>
+            <tr>
+              <td><span class="method-badge">CASH</span></td>
+              <td>{{ getMethodCount('CASH') }}</td>
+              <td><strong>₹{{ getMethodRevenue('CASH') }}</strong></td>
+            </tr>
+            <tr>
+              <td><span class="method-badge">NET_BANKING</span></td>
+              <td>{{ getMethodCount('NET_BANKING') }}</td>
+              <td><strong>₹{{ getMethodRevenue('NET_BANKING') }}</strong></td>
+            </tr>
+            <tr>
+              <td><span class="method-badge">WALLET</span></td>
+              <td>{{ getMethodCount('WALLET') }}</td>
+              <td><strong>₹{{ getMethodRevenue('WALLET') }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAYMENTS TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <h2>All Transactions</h2>
+          <span class="count">{{ payments.length }} records</span>
+        </div>
+
+        <table *ngIf="payments.length > 0">
+          <thead>
+            <tr>
+              <th>Payment ID</th>
+              <th>Booking ID</th>
+              <th>Amount</th>
+              <th>Method</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of payments">
+              <td class="id-col">#{{ p.paymentId }}</td>
+              <td class="id-col">Booking #{{ p.bookingId }}</td>
+              <td><strong>₹{{ p.amount }}</strong></td>
+              <td><span class="method-badge">{{ p.paymentMethod }}</span></td>
+              <td>
+                <span class="badge"
+                  [class.success]="p.status === 'SUCCESS'"
+                  [class.pending]="p.status === 'PENDING'"
+                  [class.failed]="p.status === 'FAILED'"
+                  [class.refunded]="p.status === 'REFUNDED'">
+                  {{ p.status }}
+                </span>
+              </td>
+              <td>{{ p.createdAt | date:'dd MMM yyyy, hh:mm a' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="empty" *ngIf="payments.length === 0">
+          <p>No transactions found.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>

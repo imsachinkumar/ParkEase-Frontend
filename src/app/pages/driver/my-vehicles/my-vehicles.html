@@ -9,15 +9,16 @@
         <a routerLink="/driver/search" class="nav-item">Find Parking</a>
         <a routerLink="/driver/bookings" class="nav-item">My Bookings</a>
         <a routerLink="/driver/vehicles" class="nav-item active">My Vehicles</a>
-        <a routerLink="#" class="nav-item">Notifications</a>
-        <a routerLink="#" class="nav-item">Profile</a>
+        <a routerLink="/driver/payments" class="nav-item">Payments</a>
+        <a routerLink="/driver/notifications" class="nav-item">Notifications</a>
+        <a routerLink="/driver/profile" class="nav-item">Profile</a>
       </nav>
     </div>
     <div class="sidebar-bottom">
       <div class="user-info">
-        <div class="avatar">S</div>
+        <div class="avatar">{{ driverName?.charAt(0) | uppercase }}</div>
         <div>
-          <div class="user-name">Sachin</div>
+          <div class="user-name">{{ driverName }}</div>
           <div class="user-role">Driver</div>
         </div>
       </div>
@@ -35,40 +36,45 @@
       </button>
     </div>
 
+    <!-- ERROR MESSAGE -->
+    <div class="error-msg" *ngIf="errorMessage">
+      ⚠️ {{ errorMessage }}
+    </div>
+
     <!-- ADD FORM -->
     <div class="card form-card" *ngIf="showAddForm">
       <h2>Add New Vehicle</h2>
       <div class="form-grid">
         <div class="form-group">
-          <label>License Plate *</label>
-          <input type="text" [(ngModel)]="newVehicle.plate"
+          <label for="input_9207">License Plate *</label>
+          <input id="input_9207" type="text" [(ngModel)]="newVehicle.plate"
                  placeholder="UP80AB1234"/>
         </div>
         <div class="form-group">
-          <label>Make *</label>
-          <input type="text" [(ngModel)]="newVehicle.make"
+          <label for="input_8106">Make *</label>
+          <input id="input_8106" type="text" [(ngModel)]="newVehicle.make"
                  placeholder="Honda"/>
         </div>
         <div class="form-group">
-          <label>Model</label>
-          <input type="text" [(ngModel)]="newVehicle.model"
+          <label for="input_2033">Model</label>
+          <input id="input_2033" type="text" [(ngModel)]="newVehicle.model"
                  placeholder="City"/>
         </div>
         <div class="form-group">
-          <label>Color</label>
-          <input type="text" [(ngModel)]="newVehicle.color"
+          <label for="input_8582">Color</label>
+          <input id="input_8582" type="text" [(ngModel)]="newVehicle.color"
                  placeholder="White"/>
         </div>
         <div class="form-group">
-          <label>Vehicle Type</label>
-          <select [(ngModel)]="newVehicle.type">
+          <label for="input_6675">Vehicle Type</label>
+          <select id="input_6675" [(ngModel)]="newVehicle.type">
             <option value="TWO_WHEELER">2-Wheeler</option>
             <option value="FOUR_WHEELER">4-Wheeler</option>
             <option value="HEAVY">Heavy Vehicle</option>
           </select>
         </div>
         <div class="form-group ev-group">
-          <label>EV Vehicle?</label>
+          <label for="isEV">EV Vehicle?</label>
           <div class="toggle-wrap">
             <input type="checkbox" id="isEV" [(ngModel)]="newVehicle.isEV"/>
             <label for="isEV" class="toggle-label">
@@ -85,7 +91,9 @@
 
     <!-- VEHICLES TABLE -->
     <div class="card">
-      <table>
+      <div class="loading" *ngIf="isLoading">Loading...</div>
+
+      <table *ngIf="!isLoading">
         <thead>
           <tr>
             <th>License Plate</th>
@@ -99,11 +107,11 @@
         </thead>
         <tbody>
           <tr *ngFor="let v of vehicles">
-            <td><strong>{{ v.plate }}</strong></td>
+            <td><strong>{{ v.licensePlate }}</strong></td>
             <td>{{ v.make }} {{ v.model }}</td>
             <td>{{ v.color }}</td>
             <td>
-              <span class="badge type">{{ v.type }}</span>
+              <span class="badge type">{{ v.vehicleType }}</span>
             </td>
             <td>{{ v.isEV ? '⚡ Yes' : '—' }}</td>
             <td>
@@ -113,14 +121,14 @@
               <div class="action-btns">
                 <button class="btn-sm blue">Edit</button>
                 <button class="btn-sm red"
-                        (click)="deleteVehicle(v.id)">Delete</button>
+                        (click)="deleteVehicle(v.vehicleId)">Delete</button>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
 
-      <div class="empty" *ngIf="vehicles.length === 0">
+      <div class="empty" *ngIf="!isLoading && vehicles.length === 0">
         <p>No vehicles registered yet.</p>
         <button class="btn-primary" (click)="toggleForm()">
           Add Your First Vehicle

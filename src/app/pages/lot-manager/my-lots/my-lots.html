@@ -1,0 +1,159 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/manager/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/manager/lots" class="nav-item active">My Lots</a>
+        <a routerLink="/manager/spots" class="nav-item">Manage Spots</a>
+        <a routerLink="/manager/bookings" class="nav-item">Bookings</a>
+        <a routerLink="/manager/revenue" class="nav-item">Revenue</a>
+        <a routerLink="/manager/profile" class="nav-item">Profile</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ managerName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ managerName }}</div>
+          <div class="user-role">Lot Manager</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>My Parking Lots</h1>
+      <button class="btn-primary" (click)="toggleForm()">
+        {{ showAddForm ? 'Cancel' : '+ Add New Lot' }}
+      </button>
+    </div>
+
+    <!-- SUCCESS MSG -->
+    <div class="success-msg" *ngIf="successMessage">
+      ✅ {{ successMessage }}
+    </div>
+
+    <!-- ERROR MSG -->
+    <div class="error-msg" *ngIf="errorMessage">
+      ⚠️ {{ errorMessage }}
+    </div>
+
+    <!-- ADD LOT FORM -->
+    <div class="card form-card" *ngIf="showAddForm">
+      <h2>Add New Parking Lot</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="input_3025">Lot Name *</label>
+          <input id="input_3025" type="text" [(ngModel)]="newLot.lotName"
+                 placeholder="City Center Parking"/>
+        </div>
+        <div class="form-group">
+          <label for="input_370">Address *</label>
+          <input id="input_370" type="text" [(ngModel)]="newLot.address"
+                 placeholder="MG Road, Block A"/>
+        </div>
+        <div class="form-group">
+          <label for="input_5881">City *</label>
+          <input id="input_5881" type="text" [(ngModel)]="newLot.city"
+                 placeholder="Agra"/>
+        </div>
+        <div class="form-group">
+          <label for="input_9124">State *</label>
+          <input id="input_9124" type="text" [(ngModel)]="newLot.state"
+                 placeholder="Uttar Pradesh"/>
+        </div>
+        <div class="form-group">
+          <label for="input_4384">Pincode</label>
+          <input id="input_4384" type="text" [(ngModel)]="newLot.pincode"
+                 placeholder="282001"/>
+        </div>
+        <div class="form-group">
+          <label for="input_6509">Total Spots *</label>
+          <input id="input_6509" type="number" [(ngModel)]="newLot.totalSpots"
+                 placeholder="50"/>
+        </div>
+        <div class="form-group">
+          <label for="input_7205">Price Per Hour (₹) *</label>
+          <input id="input_7205" type="number" [(ngModel)]="newLot.pricePerHour"
+                 placeholder="30"/>
+        </div>
+        <div class="form-group">
+          <label for="input_6067">Latitude</label>
+          <input id="input_6067" type="number" [(ngModel)]="newLot.latitude"
+                 placeholder="27.1767"/>
+        </div>
+        <div class="form-group">
+          <label for="input_2067">Longitude</label>
+          <input id="input_2067" type="number" [(ngModel)]="newLot.longitude"
+                 placeholder="78.0081"/>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" (click)="addLot()">Save Lot</button>
+        <button class="btn-cancel" (click)="toggleForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" *ngIf="isLoading">Loading lots...</div>
+
+    <!-- LOTS TABLE -->
+    <div class="card" *ngIf="!isLoading">
+      <table *ngIf="lots.length > 0">
+        <thead>
+          <tr>
+            <th>Lot ID</th>
+            <th>Lot Name</th>
+            <th>City</th>
+            <th>Address</th>
+            <th>Spots</th>
+            <th>Price/hr</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let lot of lots">
+            <td class="id-col">{{ lot.lotId }}</td>
+            <td><strong>{{ lot.lotName }}</strong></td>
+            <td>{{ lot.city }}</td>
+            <td>{{ lot.address }}</td>
+            <td>{{ lot.availableSpots }}/{{ lot.totalSpots }}</td>
+            <td>₹{{ lot.pricePerHour }}</td>
+            <td>
+              <span class="badge"
+                    [class.active]="lot.status === 'ACTIVE'"
+                    [class.cancelled]="lot.status === 'CLOSED'">
+                {{ lot.status }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm blue">Edit</button>
+                <button class="btn-sm grey"
+                        (click)="toggleLotStatus(lot)">
+                  {{ lot.status === 'ACTIVE' ? 'Close' : 'Open' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty" *ngIf="lots.length === 0">
+        <p>No parking lots found.</p>
+        <button class="btn-primary" (click)="toggleForm()">
+          Add Your First Lot
+        </button>
+      </div>
+    </div>
+
+  </main>
+</div>

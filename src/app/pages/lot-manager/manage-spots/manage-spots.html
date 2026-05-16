@@ -1,0 +1,171 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/manager/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/manager/lots" class="nav-item">My Lots</a>
+        <a routerLink="/manager/spots" class="nav-item active">Manage Spots</a>
+        <a routerLink="/manager/bookings" class="nav-item">Bookings</a>
+        <a routerLink="/manager/revenue" class="nav-item">Revenue</a>
+        <a routerLink="/manager/profile" class="nav-item">Profile</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ managerName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ managerName }}</div>
+          <div class="user-role">Lot Manager</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Manage Spots</h1>
+      <button class="btn-primary" (click)="toggleForm()"
+              [disabled]="!selectedLotId">
+        {{ showAddForm ? 'Cancel' : '+ Add Spot' }}
+      </button>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="success-msg" *ngIf="successMessage">
+      ✅ {{ successMessage }}
+    </div>
+    <div class="error-msg" *ngIf="errorMessage">
+      ⚠️ {{ errorMessage }}
+    </div>
+
+    <!-- SELECT LOT -->
+    <div class="card">
+      <h2>Select Parking Lot</h2>
+      <div class="lots-row">
+        <div class="lot-pill"
+             *ngFor="let lot of lots"
+             [class.selected]="selectedLotId === lot.lotId"
+             (click)="selectLot(lot)"
+             (keydown.enter)="selectLot(lot)"
+             tabindex="0"
+             role="button">
+          {{ lot.lotName }} — {{ lot.city }}
+        </div>
+      </div>
+      <p class="hint" *ngIf="lots.length === 0">
+        No lots found. Add a lot first!
+      </p>
+    </div>
+
+    <!-- ADD SPOT FORM -->
+    <div class="card form-card" *ngIf="showAddForm">
+      <h2>Add New Spot — {{ selectedLotName }}</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="input_7056">Spot Number *</label>
+          <input id="input_7056" type="text" [(ngModel)]="newSpot.spotNumber"
+                 placeholder="A-01"/>
+        </div>
+        <div class="form-group">
+          <label for="input_1085">Spot Type</label>
+          <select id="input_1085" [(ngModel)]="newSpot.spotType">
+            <option value="TWO_WHEELER">2-Wheeler</option>
+            <option value="FOUR_WHEELER">4-Wheeler</option>
+            <option value="HEAVY">Heavy Vehicle</option>
+            <option value="EV">EV</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="isEV">EV Charging?</label>
+          <div class="toggle-wrap">
+            <input type="checkbox" id="isEV" [(ngModel)]="newSpot.isEV"/>
+            <label for="isEV">{{ newSpot.isEV ? '⚡ Yes' : 'No' }}</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="isCovered">Covered?</label>
+          <div class="toggle-wrap">
+            <input type="checkbox" id="isCovered"
+                   [(ngModel)]="newSpot.isCovered"/>
+            <label for="isCovered">
+              {{ newSpot.isCovered ? '✅ Yes' : 'No' }}
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" (click)="addSpot()">Save Spot</button>
+        <button class="btn-cancel" (click)="toggleForm()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- SPOTS TABLE -->
+    <div class="card" *ngIf="selectedLotId">
+      <div class="card-header">
+        <h2>Spots — {{ selectedLotName }}</h2>
+        <span class="count">{{ spots.length }} spots</span>
+      </div>
+
+      <div class="loading" *ngIf="isLoading">Loading spots...</div>
+
+      <table *ngIf="!isLoading && spots.length > 0">
+        <thead>
+          <tr>
+            <th>Spot ID</th>
+            <th>Spot Number</th>
+            <th>Type</th>
+            <th>EV</th>
+            <th>Covered</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let spot of spots">
+            <td class="id-col">{{ spot.spotId }}</td>
+            <td><strong>{{ spot.spotNumber }}</strong></td>
+            <td>
+              <span class="badge type">{{ spot.spotType }}</span>
+            </td>
+            <td>{{ spot.isEV ? '⚡ Yes' : '—' }}</td>
+            <td>{{ spot.isCovered ? '✅ Yes' : '—' }}</td>
+            <td>
+              <span class="badge"
+                    [class.active]="spot.status === 'AVAILABLE'"
+                    [class.occupied]="spot.status === 'OCCUPIED'"
+                    [class.cancelled]="spot.status === 'MAINTENANCE'">
+                {{ spot.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-sm red"
+                      (click)="deleteSpot(spot.spotId)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty"
+           *ngIf="!isLoading && spots.length === 0">
+        <p>No spots found for this lot.</p>
+        <button class="btn-primary" (click)="toggleForm()">
+          Add First Spot
+        </button>
+      </div>
+    </div>
+
+    <!-- NO LOT SELECTED -->
+    <div class="empty-state" *ngIf="!selectedLotId">
+      <p>👆 Select a parking lot above to manage its spots.</p>
+    </div>
+
+  </main>
+</div>

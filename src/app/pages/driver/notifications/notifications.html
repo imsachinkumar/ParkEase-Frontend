@@ -1,0 +1,67 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/driver/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/driver/search" class="nav-item">Find Parking</a>
+        <a routerLink="/driver/bookings" class="nav-item">My Bookings</a>
+        <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
+        <a routerLink="/driver/payments" class="nav-item">Payments</a>
+        <a routerLink="/driver/notifications" class="nav-item active">Notifications</a>
+        <a routerLink="/driver/profile" class="nav-item">Profile</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ driverName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ driverName }}</div>
+          <div class="user-role">Driver</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Notifications</h1>
+      <button class="btn-primary" (click)="loadNotifications()">🔄 Refresh</button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="card" *ngIf="isLoading">
+      <div class="loading">Loading notifications...</div>
+    </div>
+
+    <!-- NOTIFICATIONS LIST -->
+    <div class="card" *ngIf="!isLoading">
+
+      <div class="empty" *ngIf="notifications.length === 0">
+        <p>🔔 No notifications yet!</p>
+        <a routerLink="/driver/search" class="btn-primary">Find Parking</a>
+      </div>
+
+      <div class="notification-list" *ngIf="notifications.length > 0">
+        <div class="notification-item" *ngFor="let n of notifications"
+             [class.unread]="n.status === 'UNREAD'">
+          <div class="notif-icon">{{ getIcon(n.type) }}</div>
+          <div class="notif-content">
+            <div class="notif-title">{{ n.title }}</div>
+            <div class="notif-message">{{ n.message }}</div>
+            <div class="notif-time">
+              {{ n.sentAt | date:'dd MMM yyyy, hh:mm a' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>

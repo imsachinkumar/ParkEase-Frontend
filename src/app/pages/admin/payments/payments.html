@@ -1,0 +1,132 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/admin/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/admin/users" class="nav-item">Manage Users</a>
+        <a routerLink="/admin/lots" class="nav-item">Manage Lots</a>
+        <a routerLink="/admin/bookings" class="nav-item">All Bookings</a>
+        <a routerLink="/admin/payments" class="nav-item active">Payments</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ adminName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ adminName }}</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Payments</h1>
+      <button class="btn-refresh" (click)="loadPayments()">🔄 Refresh</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid" *ngIf="!isLoading">
+      <div class="stat-card green">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value">₹{{ totalRevenue }}</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">Total Transactions</div>
+        <div class="stat-value">{{ totalTransactions }}</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Successful</div>
+        <div class="stat-value">{{ successCount }}</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value">{{ pendingCount }}</div>
+      </div>
+    </div>
+
+    <!-- STATUS FILTER -->
+    <div class="filter-row">
+      <button
+        *ngFor="let s of statuses"
+        class="filter-btn"
+        [class.active]="selectedStatus === s"
+        (click)="filterByStatus(s)">
+        {{ s }}
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" *ngIf="isLoading">Loading payments...</div>
+
+    <!-- TABLE -->
+    <div class="card" *ngIf="!isLoading">
+      <div class="card-header">
+        <h2>All Payments</h2>
+        <span class="count">{{ filteredPayments.length }} records</span>
+      </div>
+
+      <table *ngIf="filteredPayments.length > 0">
+        <thead>
+          <tr>
+            <th>Payment ID</th>
+            <th>Booking ID</th>
+            <th>User ID</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filteredPayments">
+            <td class="id-col">#{{ p.paymentId }}</td>
+            <td class="id-col">Booking #{{ p.bookingId }}</td>
+            <td class="id-col">User #{{ p.userId }}</td>
+            <td><strong>₹{{ p.amount }}</strong></td>
+            <td><span class="method-badge">{{ p.paymentMethod }}</span></td>
+            <td>
+              <span class="badge"
+                [class.success]="p.status === 'SUCCESS'"
+                [class.pending]="p.status === 'PENDING'"
+                [class.failed]="p.status === 'FAILED'"
+                [class.refunded]="p.status === 'REFUNDED'">
+                {{ p.status }}
+              </span>
+            </td>
+            <td>{{ p.createdAtFormatted }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm green"
+                  *ngIf="p.status === 'PENDING'"
+                  (click)="processPayment(p.paymentId)">
+                  Process
+                </button>
+                <button class="btn-sm red"
+                  *ngIf="p.status === 'SUCCESS'"
+                  (click)="refundPayment(p.paymentId)">
+                  Refund
+                </button>
+                <span *ngIf="p.status === 'FAILED' || p.status === 'REFUNDED'"
+                  class="no-action">—</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty" *ngIf="filteredPayments.length === 0">
+        <p>No payments found.</p>
+      </div>
+    </div>
+
+  </main>
+</div>

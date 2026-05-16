@@ -1,0 +1,128 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/driver/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/driver/search" class="nav-item">Find Parking</a>
+        <a routerLink="/driver/bookings" class="nav-item">My Bookings</a>
+        <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
+        <a routerLink="/driver/payments" class="nav-item">Payments</a>
+        <a routerLink="/driver/notifications" class="nav-item">Notifications</a>
+        <a routerLink="/driver/profile" class="nav-item active">Profile</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ driverName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ driverName }}</div>
+          <div class="user-role">Driver</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>My Profile</h1>
+      <button class="btn-primary" (click)="toggleEdit()">
+        {{ isEditing ? 'Cancel' : '✏️ Edit Profile' }}
+      </button>
+    </div>
+
+    <!-- SUCCESS MESSAGE -->
+    <div class="success-msg" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+
+    <!-- PROFILE CARD -->
+    <div class="card">
+      <div class="profile-header">
+        <div class="avatar-large">{{ driverName?.charAt(0) | uppercase }}</div>
+        <div class="profile-info">
+          <h2>{{ driverName }}</h2>
+          <p class="role-badge">{{ role }}</p>
+        </div>
+      </div>
+
+      <!-- VIEW MODE -->
+      <div class="profile-details" *ngIf="!isEditing">
+        <div class="detail-row">
+          <span class="label">Full Name</span>
+          <span class="value">{{ driverName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Email</span>
+          <span class="value">{{ email }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Phone</span>
+          <span class="value">{{ phone || 'Not provided' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Role</span>
+          <span class="value">{{ role }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">User ID</span>
+          <span class="value">#{{ userId }}</span>
+        </div>
+      </div>
+
+      <!-- EDIT MODE -->
+      <div class="edit-form" *ngIf="isEditing">
+        <div class="form-group">
+          <label for="input_69">Full Name</label>
+          <input id="input_69" type="text" [(ngModel)]="editData.fullName"
+                 placeholder="Your full name"/>
+        </div>
+        <div class="form-group">
+          <label for="input_6361">Email</label>
+          <input id="input_6361" type="email" [value]="email" disabled
+                 class="disabled-input"/>
+          <small>Email cannot be changed</small>
+        </div>
+        <div class="form-group">
+          <label for="input_9491">Phone</label>
+          <input id="input_9491" type="tel" [(ngModel)]="editData.phone"
+                 placeholder="+91 98765 43210"/>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" (click)="saveProfile()">Save Changes</button>
+          <button class="btn-cancel" (click)="toggleEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="card">
+      <h2>Quick Links</h2>
+      <div class="quick-links">
+        <a routerLink="/driver/bookings" class="quick-link">
+          📋 My Bookings
+        </a>
+        <a routerLink="/driver/vehicles" class="quick-link">
+          🚗 My Vehicles
+        </a>
+        <a routerLink="/driver/payments" class="quick-link">
+          💳 Payment History
+        </a>
+        <a routerLink="/driver/notifications" class="quick-link">
+          🔔 Notifications
+        </a>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="card logout-card">
+      <button class="btn-logout" (click)="logout()">🚪 Logout</button>
+    </div>
+
+  </main>
+</div>

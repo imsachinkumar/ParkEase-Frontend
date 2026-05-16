@@ -5,18 +5,16 @@
     <div class="sidebar-top">
       <div class="logo">ParkEase</div>
       <nav>
-        <a routerLink="/admin/dashboard" class="nav-item active">Dashboard</a>
-        <a routerLink="#" class="nav-item">Manage Users</a>
-        <a routerLink="#" class="nav-item">Manage Lots</a>
-        <a routerLink="#" class="nav-item">All Bookings</a>
-        <a routerLink="#" class="nav-item">Payments</a>
-        <a routerLink="#" class="nav-item">Analytics</a>
-        <a routerLink="#" class="nav-item">Notifications</a>
-      </nav>
+  <a routerLink="/admin/dashboard" class="nav-item active">Dashboard</a>
+  <a routerLink="/admin/users" class="nav-item">Manage Users</a>
+  <a routerLink="/admin/lots" class="nav-item">Manage Lots</a>
+  <a routerLink="/admin/bookings" class="nav-item">All Bookings</a>
+  <a routerLink="/admin/payments" class="nav-item">Payments</a>
+</nav>
     </div>
     <div class="sidebar-bottom">
       <div class="user-info">
-        <div class="avatar">A</div>
+        <div class="avatar">{{ adminName?.charAt(0) | uppercase }}</div>
         <div>
           <div class="user-name">{{ adminName }}</div>
           <div class="user-role">Administrator</div>
@@ -42,32 +40,37 @@
       </div>
     </div>
 
-    <!-- PENDING LOT APPROVALS -->
+    <!-- PARKING LOTS -->
     <div class="card">
       <div class="card-header">
-        <h2>Pending Lot Approvals</h2>
-        <span class="pending-count">{{ pendingLots.length }} pending</span>
+        <h2>All Parking Lots</h2>
+        <span class="pending-count">{{ pendingLots.length }} lots</span>
       </div>
-      <table>
+
+      <table *ngIf="pendingLots.length > 0">
         <thead>
           <tr>
             <th>Lot ID</th>
             <th>Lot Name</th>
-            <th>Manager</th>
             <th>City</th>
             <th>Spots</th>
-            <th>Date</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let lot of pendingLots">
-            <td class="id-col">{{ lot.id }}</td>
-            <td><strong>{{ lot.name }}</strong></td>
-            <td>{{ lot.manager }}</td>
+            <td class="id-col">{{ lot.lotId }}</td>
+            <td><strong>{{ lot.lotName || lot.name }}</strong></td>
             <td>{{ lot.city }}</td>
-            <td>{{ lot.spots }}</td>
-            <td>{{ lot.date }}</td>
+            <td>{{ lot.totalSpots }}</td>
+            <td>
+              <span class="badge"
+                [class.active]="lot.status === 'ACTIVE' || lot.status === 'OPEN'"
+                [class.cancelled]="lot.status === 'CLOSED'">
+                {{ lot.status }}
+              </span>
+            </td>
             <td>
               <div class="action-btns">
                 <button class="btn-approve" (click)="approveLot(lot)">
@@ -81,49 +84,55 @@
           </tr>
         </tbody>
       </table>
+
+      <div class="empty" *ngIf="pendingLots.length === 0">
+        <p>No lots found.</p>
+      </div>
     </div>
 
     <!-- RECENT USERS -->
     <div class="card">
       <div class="card-header">
         <h2>Recent Users</h2>
-        <a href="#" class="view-all">View all</a>
       </div>
-      <table>
+
+      <div class="empty" *ngIf="recentUsers.length === 0">
+        <p>No users data available.</p>
+      </div>
+
+      <table *ngIf="recentUsers.length > 0">
         <thead>
           <tr>
             <th>User ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Role</th>
-            <th>Joined</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let user of recentUsers">
-            <td class="id-col">{{ user.id }}</td>
-            <td><strong>{{ user.name }}</strong></td>
+            <td class="id-col">{{ user.userId }}</td>
+            <td><strong>{{ user.fullName }}</strong></td>
             <td>{{ user.email }}</td>
             <td>
               <span class="badge"
-                    [class.driver]="user.role === 'DRIVER'"
-                    [class.manager]="user.role === 'MANAGER'">
+                [class.driver]="user.role === 'DRIVER'"
+                [class.manager]="user.role === 'MANAGER'">
                 {{ user.role }}
               </span>
             </td>
-            <td>{{ user.date }}</td>
             <td>
               <span class="badge"
-                    [class.active]="user.status === 'ACTIVE'"
-                    [class.suspended]="user.status === 'SUSPENDED'">
-                {{ user.status }}
+                [class.active]="user.isActive"
+                [class.suspended]="!user.isActive">
+                {{ user.isActive ? 'ACTIVE' : 'SUSPENDED' }}
               </span>
             </td>
             <td>
               <button class="btn-toggle" (click)="suspendUser(user)">
-                {{ user.status === 'ACTIVE' ? 'Suspend' : 'Activate' }}
+                {{ user.isActive ? 'Suspend' : 'Activate' }}
               </button>
             </td>
           </tr>
@@ -135,14 +144,17 @@
     <div class="card">
       <div class="card-header">
         <h2>Recent Bookings</h2>
-        <a href="#" class="view-all">View all</a>
       </div>
-      <table>
+
+      <div class="empty" *ngIf="recentBookings.length === 0">
+        <p>No bookings data available.</p>
+      </div>
+
+      <table *ngIf="recentBookings.length > 0">
         <thead>
           <tr>
             <th>Booking ID</th>
-            <th>Parking Lot</th>
-            <th>Driver</th>
+            <th>Lot ID</th>
             <th>Date</th>
             <th>Amount</th>
             <th>Status</th>
@@ -150,16 +162,15 @@
         </thead>
         <tbody>
           <tr *ngFor="let b of recentBookings">
-            <td class="id-col">{{ b.id }}</td>
-            <td>{{ b.lot }}</td>
-            <td>{{ b.driver }}</td>
-            <td>{{ b.date }}</td>
-            <td>{{ b.amount }}</td>
+            <td class="id-col">{{ b.bookingId }}</td>
+            <td>Lot #{{ b.lotId }}</td>
+            <td>{{ b.startTime | date:'dd MMM yyyy' }}</td>
+            <td>{{ b.totalAmount ? '₹' + b.totalAmount : 'N/A' }}</td>
             <td>
               <span class="badge"
-                    [class.active]="b.status === 'ACTIVE'"
-                    [class.completed]="b.status === 'COMPLETED'"
-                    [class.cancelled]="b.status === 'CANCELLED'">
+                [class.active]="b.status === 'CONFIRMED' || b.status === 'ACTIVE'"
+                [class.completed]="b.status === 'COMPLETED'"
+                [class.cancelled]="b.status === 'CANCELLED'">
                 {{ b.status }}
               </span>
             </td>

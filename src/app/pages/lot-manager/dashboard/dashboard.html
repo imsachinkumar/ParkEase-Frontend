@@ -5,12 +5,12 @@
     <div class="sidebar-top">
       <div class="logo">ParkEase</div>
       <nav>
-        <a routerLink="/manager/dashboard" class="nav-item active">Dashboard</a>
-        <a routerLink="#" class="nav-item">My Lots</a>
-        <a routerLink="#" class="nav-item">Manage Spots</a>
-        <a routerLink="#" class="nav-item">Bookings</a>
-        <a routerLink="#" class="nav-item">Revenue</a>
-        <a routerLink="#" class="nav-item">Notifications</a>
+        <a routerLink="/manager/dashboard" routerLinkActive="active" class="nav-item">Dashboard</a>
+        <a routerLink="/manager/lots" routerLinkActive="active" class="nav-item">My Lots</a>
+        <a routerLink="/manager/spots" routerLinkActive="active" class="nav-item">Manage Spots</a>
+        <a routerLink="/manager/bookings" routerLinkActive="active" class="nav-item">Bookings</a>
+        <a routerLink="/manager/revenue" routerLinkActive="active" class="nav-item">Revenue</a>
+        <a routerLink="/manager/profile" class="nav-item">Profile</a>
       </nav>
     </div>
     <div class="sidebar-bottom">
@@ -30,7 +30,7 @@
 
     <div class="topbar">
       <h1>Manager Dashboard</h1>
-      <button class="btn-primary">+ Add New Lot</button>
+      <a routerLink="/manager/lots" class="btn-primary">+ Add New Lot</a>
     </div>
 
     <!-- STATS -->
@@ -45,7 +45,7 @@
     <div class="card">
       <div class="card-header">
         <h2>My Parking Lots</h2>
-        <button class="btn-sm">+ Add Lot</button>
+        <a routerLink="/manager/lots" class="view-all">Manage →</a>
       </div>
       <table>
         <thead>
@@ -84,7 +84,7 @@
     <div class="card">
       <div class="card-header">
         <h2>Recent Bookings</h2>
-        <a href="#" class="view-all">View all</a>
+        <a routerLink="/manager/bookings" class="view-all">View all</a>
       </div>
       <table>
         <thead>

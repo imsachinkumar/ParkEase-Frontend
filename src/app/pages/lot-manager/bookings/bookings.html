@@ -1,0 +1,116 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/manager/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/manager/lots" class="nav-item">My Lots</a>
+        <a routerLink="/manager/spots" class="nav-item">Manage Spots</a>
+        <a routerLink="/manager/bookings" class="nav-item active">Bookings</a>
+        <a routerLink="/manager/revenue" class="nav-item">Revenue</a>
+        <a routerLink="/manager/profile" class="nav-item">Profile</a>
+        
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ managerName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ managerName }}</div>
+          <div class="user-role">Lot Manager</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Bookings</h1>
+      <button class="btn-refresh" (click)="loadBookings()">🔄 Refresh</button>
+    </div>
+
+    <!-- STATUS FILTER -->
+    <div class="filter-row">
+      <button
+        *ngFor="let s of statuses"
+        class="filter-btn"
+        [class.active]="selectedStatus === s"
+        (click)="filterByStatus(s)">
+        {{ s }}
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" *ngIf="isLoading">Loading bookings...</div>
+
+    <!-- TABLE -->
+    <div class="card" *ngIf="!isLoading">
+      <div class="card-header">
+        <h2>All Bookings</h2>
+        <span class="count">{{ filteredBookings.length }} records</span>
+      </div>
+
+      <table *ngIf="filteredBookings.length > 0">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Driver</th>
+            <th>Lot</th>
+            <th>Spot</th>
+            <th>Vehicle</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of filteredBookings">
+            <td class="id-col">#{{ b.bookingId }}</td>
+            <td>{{ b.driverName || b.userId }}</td>
+            <td>{{ b.lotName || b.lotId }}</td>
+            <td>{{ b.spotNumber || b.spotId }}</td>
+            <td>{{ b.vehicleNumber || '—' }}</td>
+            <td>{{ b.startTime | date:'dd MMM, hh:mm a' }}</td>
+            <td>{{ b.endTime | date:'dd MMM, hh:mm a' }}</td>
+            <td><strong>₹{{ b.totalAmount || '—' }}</strong></td>
+            <td>
+              <span class="badge"
+                [class.confirmed]="b.status === 'CONFIRMED'"
+                [class.pending]="b.status === 'PENDING'"
+                [class.completed]="b.status === 'COMPLETED'"
+                [class.cancelled]="b.status === 'CANCELLED'">
+                {{ b.status }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn-sm green"
+                *ngIf="b.status === 'PENDING'"
+                (click)="confirmBooking(b.bookingId)">
+                Confirm
+              </button>
+              <button class="btn-sm red"
+                *ngIf="b.status === 'PENDING' || b.status === 'CONFIRMED'"
+                (click)="cancelBooking(b.bookingId)">
+                Cancel
+              </button>
+              <span *ngIf="b.status === 'COMPLETED' || b.status === 'CANCELLED'"
+                class="no-action">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty" *ngIf="filteredBookings.length === 0">
+        <p>No bookings found for selected filter.</p>
+      </div>
+    </div>
+
+  </main>
+</div>

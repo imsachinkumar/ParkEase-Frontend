@@ -1,0 +1,131 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/manager/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/manager/lots" class="nav-item">My Lots</a>
+        <a routerLink="/manager/spots" class="nav-item">Manage Spots</a>
+        <a routerLink="/manager/bookings" class="nav-item">Bookings</a>
+        <a routerLink="/manager/revenue" class="nav-item">Revenue</a>
+        <a routerLink="/manager/profile" class="nav-item active">Profile</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ managerName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ managerName }}</div>
+          <div class="user-role">Lot Manager</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>My Profile</h1>
+      <button class="btn-primary" (click)="toggleEdit()">
+        {{ isEditing ? 'Cancel' : '✏️ Edit Profile' }}
+      </button>
+    </div>
+
+    <!-- SUCCESS MESSAGE -->
+    <div class="success-msg" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+
+    <!-- PROFILE CARD -->
+    <div class="card">
+      <div class="profile-header">
+        <div class="avatar-large">
+          {{ managerName?.charAt(0) | uppercase }}
+        </div>
+        <div class="profile-info">
+          <h2>{{ managerName }}</h2>
+          <p class="role-badge">{{ role }}</p>
+        </div>
+      </div>
+
+      <!-- VIEW MODE -->
+      <div class="profile-details" *ngIf="!isEditing">
+        <div class="detail-row">
+          <span class="label">Full Name</span>
+          <span class="value">{{ managerName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Email</span>
+          <span class="value">{{ email }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Phone</span>
+          <span class="value">{{ phone || 'Not provided' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Role</span>
+          <span class="value">{{ role }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">User ID</span>
+          <span class="value">#{{ userId }}</span>
+        </div>
+      </div>
+
+      <!-- EDIT MODE -->
+      <div class="edit-form" *ngIf="isEditing">
+        <div class="form-group">
+          <label for="input_270">Full Name</label>
+          <input id="input_270" type="text" [(ngModel)]="editData.fullName"
+                 placeholder="Your full name"/>
+        </div>
+        <div class="form-group">
+          <label for="input_9034">Email</label>
+          <input id="input_9034" type="email" [value]="email" disabled
+                 class="disabled-input"/>
+          <small>Email cannot be changed</small>
+        </div>
+        <div class="form-group">
+          <label for="input_7116">Phone</label>
+          <input id="input_7116" type="tel" [(ngModel)]="editData.phone"
+                 placeholder="+91 98765 43210"/>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" (click)="saveProfile()">
+            Save Changes
+          </button>
+          <button class="btn-cancel" (click)="toggleEdit()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="card">
+      <h2>Quick Links</h2>
+      <div class="quick-links">
+        <a routerLink="/manager/lots" class="quick-link">
+          🅿️ My Lots
+        </a>
+        <a routerLink="/manager/spots" class="quick-link">
+          📍 Manage Spots
+        </a>
+        <a routerLink="/manager/bookings" class="quick-link">
+          📋 Bookings
+        </a>
+        <a routerLink="/manager/revenue" class="quick-link">
+          💰 Revenue
+        </a>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="card logout-card">
+      <button class="btn-logout" (click)="logout()">🚪 Logout</button>
+    </div>
+
+  </main>
+</div>

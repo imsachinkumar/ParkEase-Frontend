@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ApiService } from '../../../services/api';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -9,49 +11,54 @@ import { RouterLink } from '@angular/router';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class AdminDashboardComponent {
-  adminName = 'Admin';
+export class AdminDashboardComponent implements OnInit {
+  adminName = '';
 
   stats = [
-    { label: 'Total Users', value: '1,248' },
-    { label: 'Total Lots', value: '42' },
-    { label: 'Total Bookings', value: '3,891' },
-    { label: 'Platform Revenue', value: '₹1.2L' }
+    { label: 'Total Users', value: '0' },
+    { label: 'Total Lots', value: '0' },
+    { label: 'Total Bookings', value: '0' },
+    { label: 'Platform Revenue', value: '₹0' }
   ];
 
-  recentUsers = [
-    { id: 'U-001', name: 'Sachin Kumar', email: 'sachin@gmail.com',
-      role: 'DRIVER', date: '23 Apr 2024', status: 'ACTIVE' },
-    { id: 'U-002', name: 'Rahul Sharma', email: 'rahul@gmail.com',
-      role: 'MANAGER', date: '22 Apr 2024', status: 'ACTIVE' },
-    { id: 'U-003', name: 'Priya Singh', email: 'priya@gmail.com',
-      role: 'DRIVER', date: '21 Apr 2024', status: 'SUSPENDED' },
-    { id: 'U-004', name: 'Amit Gupta', email: 'amit@gmail.com',
-      role: 'MANAGER', date: '20 Apr 2024', status: 'ACTIVE' },
-  ];
+  recentUsers: any[] = [];
+  pendingLots: any[] = [];
+  recentBookings: any[] = [];
 
-  pendingLots = [
-    { id: 'L-001', name: 'New City Parking', manager: 'Rahul S.',
-      city: 'Agra', spots: 50, date: '23 Apr 2024' },
-    { id: 'L-002', name: 'Highway Parking', manager: 'Amit G.',
-      city: 'Mathura', spots: 30, date: '22 Apr 2024' },
-  ];
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef
+  ) {}
 
-  recentBookings = [
-    { id: 'BK-201', lot: 'City Center Parking', driver: 'Sachin K.',
-      date: '23 Apr 2024', amount: '₹80', status: 'ACTIVE' },
-    { id: 'BK-202', lot: 'Mall Parking', driver: 'Priya S.',
-      date: '22 Apr 2024', amount: '₹120', status: 'COMPLETED' },
-    { id: 'BK-203', lot: 'Station Parking', driver: 'Raj P.',
-      date: '21 Apr 2024', amount: '₹60', status: 'CANCELLED' },
-  ];
+  ngOnInit() {
+    const user = this.authService.getCurrentUser();
+    this.adminName = user?.fullName || user?.name || 'Admin';
+    this.loadDashboardData();
+  }
+
+  loadDashboardData() {
+    // Lots load karo
+    this.apiService.getAllLots().subscribe({
+      next: (res) => {
+        const lots = res.data || [];
+        const uniqueLots = lots.filter((lot: any, index: number, self: any[]) =>
+          index === self.findIndex((l) => l.lotName === lot.lotName)
+        );
+        this.stats[1].value = uniqueLots.length.toString();
+        this.pendingLots = uniqueLots.slice(0, 5);
+        this.cdr.detectChanges();
+      },
+      error: () => {}
+    });
+  }
 
   approveLot(lot: any) {
-    alert('Lot approved: ' + lot.name);
+    alert('Lot approved: ' + (lot.lotName || lot.name));
   }
 
   rejectLot(lot: any) {
-    alert('Lot rejected: ' + lot.name);
+    alert('Lot rejected: ' + (lot.lotName || lot.name));
   }
 
   suspendUser(user: any) {

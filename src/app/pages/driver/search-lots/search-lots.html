@@ -3,18 +3,19 @@
   <aside class="sidebar">
     <div class="logo">ParkEase</div>
     <nav>
-      <a routerLink="/driver/dashboard" class="nav-item">Dashboard</a>
-      <a routerLink="/driver/search"    class="nav-item active">Find Parking</a>
-      <a routerLink="/driver/bookings"  class="nav-item">My Bookings</a>
-      <a routerLink="/driver/vehicles"  class="nav-item">My Vehicles</a>
-      <a routerLink="#"                 class="nav-item">Notifications</a>
-      <a routerLink="#"                 class="nav-item">Profile</a>
-    </nav>
+  <a routerLink="/driver/dashboard" class="nav-item">Dashboard</a>
+  <a routerLink="/driver/search" class="nav-item active">Find Parking</a>
+  <a routerLink="/driver/bookings" class="nav-item">My Bookings</a>
+  <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
+  <a routerLink="/driver/payments" class="nav-item">Payments</a>
+  <a routerLink="/driver/notifications" class="nav-item">Notifications</a>
+  <a routerLink="/driver/profile" class="nav-item">Profile</a>
+</nav>
     <div class="sidebar-footer">
       <div class="user-info">
-        <div class="avatar">S</div>
+        <div class="avatar">{{ driverName?.charAt(0) | uppercase }}</div>
         <div>
-          <div class="user-name">Sachin</div>
+          <div class="user-name">{{ driverName }}</div>
           <div class="user-role">Driver</div>
         </div>
       </div>
@@ -28,13 +29,18 @@
       <h2>Find Parking</h2>
     </div>
 
+    <!-- SUCCESS MESSAGE -->
+    <div class="success-msg" *ngIf="successMessage">
+      ✅ {{ successMessage }}
+    </div>
+
     <!-- SEARCH BAR -->
     <div class="search-bar">
       <input type="text" [(ngModel)]="searchCity"
              placeholder="Enter city or address..."
              (keyup.enter)="onSearch()"/>
       <label class="ev-label">
-        <input type="checkbox" [(ngModel)]="showEVOnly"/> EV Only
+        <input id="input_3743" type="checkbox" [(ngModel)]="showEVOnly"/> EV Only
       </label>
       <button (click)="onSearch()">Search</button>
     </div>
@@ -47,19 +53,27 @@
       <button (click)="quickSearch('Delhi')">Delhi</button>
     </div>
 
-    <!-- EMPTY (before search) -->
-    <div *ngIf="!isSearched" class="empty">
+    <!-- LOADING -->
+    <div *ngIf="isLoading" class="empty">
+      <p>Loading parking lots...</p>
+    </div>
+
+    <!-- EMPTY -->
+    <div *ngIf="!isLoading && !isSearched && filteredLots.length === 0" class="empty">
       <p>Search for a city or area to see available parking lots.</p>
     </div>
 
     <!-- NO RESULTS -->
-    <div *ngIf="isSearched && filteredLots.length === 0" class="empty">
+    <div *ngIf="!isLoading && isSearched && filteredLots.length === 0" class="empty">
       <p>No parking lots found. Try a different search.</p>
     </div>
 
     <!-- RESULTS -->
-    <div *ngIf="isSearched && filteredLots.length > 0">
-      <div class="results-count">{{ filteredLots.length }} lots found for "{{ searchCity }}"</div>
+    <div *ngIf="!isLoading && filteredLots.length > 0">
+      <div class="results-count">
+        {{ filteredLots.length }} lots found
+        <span *ngIf="searchCity"> for "{{ searchCity }}"</span>
+      </div>
       <table class="table">
         <thead>
           <tr>
@@ -75,27 +89,64 @@
         </thead>
         <tbody>
           <tr *ngFor="let lot of filteredLots">
-            <td><strong>{{ lot.name }}</strong></td>
+            <td><strong>{{ lot.lotName || lot.name }}</strong></td>
             <td class="muted">{{ lot.address }}, {{ lot.city }}</td>
-            <td>{{ lot.available }} / {{ lot.total }}</td>
-            <td>₹{{ lot.price }}/hr</td>
-            <td>{{ lot.rating }}</td>
-            <td>{{ lot.hasEV ? 'Yes' : '—' }}</td>
+            <td>{{ lot.availableSpots ?? lot.available }} / {{ lot.totalSpots ?? lot.total }}</td>
+            <td>₹{{ lot.pricePerHour || lot.price }}/hr</td>
+            <td>⭐ {{ lot.rating || 'N/A' }}</td>
+            <td>{{ (lot.hasEVCharging || lot.hasEV || lot.isEV) ? '⚡ Yes' : '—' }}</td>
             <td>
               <span class="badge"
-                [class.badge-open]="lot.status === 'Open'"
-                [class.badge-full]="lot.status === 'Full'">
+                [class.badge-open]="lot.status === 'Open' || lot.status === 'ACTIVE'"
+                [class.badge-full]="lot.status === 'Full' || lot.status === 'FULL'">
                 {{ lot.status }}
               </span>
             </td>
             <td>
-              <button class="btn-book" [disabled]="lot.available === 0">
-                {{ lot.available === 0 ? 'Full' : 'Book' }}
+              <button class="btn-book"
+                [disabled]="(lot.availableSpots ?? lot.available) === 0"
+                (click)="openBooking(lot)">
+                {{ (lot.availableSpots ?? lot.available) === 0 ? 'Full' : 'Book' }}
               </button>
             </td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- BOOKING MODAL -->
+    <div class="modal-overlay" *ngIf="showBookingModal" (click)="closeBooking()" (keydown.enter)="closeBooking()" tabindex="0" role="button">
+      <div class="modal-box" (click)="$event.stopPropagation()" (keydown.enter)="$event.stopPropagation()" tabindex="0" role="button">
+        <h3>Book Parking</h3>
+        <p class="modal-lot">📍 {{ selectedLot?.lotName }}</p>
+
+        <div class="form-group">
+          <label for="input_1350">Select Vehicle</label>
+          <select id="input_1350" [(ngModel)]="bookingData.vehicleId">
+            <option value="">-- Select Vehicle --</option>
+            <option *ngFor="let v of myVehicles" [value]="v.vehicleId">
+              {{ v.licensePlate }} — {{ v.make }} {{ v.model }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="input_2421">Start Time</label>
+          <input id="input_2421" type="datetime-local" [(ngModel)]="bookingData.startTime"/>
+        </div>
+
+        <div class="form-group">
+          <label for="input_8091">End Time</label>
+          <input id="input_8091" type="datetime-local" [(ngModel)]="bookingData.endTime"/>
+        </div>
+
+        <div class="error-msg" *ngIf="errorMessage">⚠️ {{ errorMessage }}</div>
+
+        <div class="modal-actions">
+          <button class="btn-primary" (click)="confirmBooking()">Confirm Booking</button>
+          <button class="btn-cancel" (click)="closeBooking()">Cancel</button>
+        </div>
+      </div>
     </div>
 
   </main>

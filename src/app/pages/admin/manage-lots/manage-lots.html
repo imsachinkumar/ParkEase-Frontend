@@ -1,0 +1,125 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/admin/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/admin/users" class="nav-item">Manage Users</a>
+        <a routerLink="/admin/lots" class="nav-item active">Manage Lots</a>
+        <a routerLink="/admin/bookings" class="nav-item">All Bookings</a>
+        <a routerLink="/admin/payments" class="nav-item">Payments</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ adminName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ adminName }}</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Manage Lots</h1>
+      <button class="btn-refresh" (click)="loadLots()">🔄 Refresh</button>
+    </div>
+
+    <!-- STATUS FILTER -->
+    <div class="filter-row">
+      <button
+        *ngFor="let s of statuses"
+        class="filter-btn"
+        [class.active]="selectedStatus === s"
+        (click)="filterByStatus(s)">
+        {{ s }}
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" *ngIf="isLoading">Loading lots...</div>
+
+    <!-- TABLE -->
+    <div class="card" *ngIf="!isLoading">
+      <div class="card-header">
+        <h2>All Parking Lots</h2>
+        <span class="count">{{ filteredLots.length }} lots</span>
+      </div>
+
+      <table *ngIf="filteredLots.length > 0">
+        <thead>
+          <tr>
+            <th>Lot ID</th>
+            <th>Lot Name</th>
+            <th>City</th>
+            <th>Address</th>
+            <th>Total Spots</th>
+            <th>Price/hr</th>
+            <th>EV</th>
+            <th>Status</th>
+            <th>Status Action</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of filteredLots">
+            <td class="id-col">#{{ l.lotId }}</td>
+            <td><strong>{{ l.lotName }}</strong></td>
+            <td>{{ l.city }}</td>
+            <td>{{ l.address }}</td>
+            <td>{{ l.totalSpots }}</td>
+            <td>₹{{ l.pricePerHour }}/hr</td>
+            <td>{{ l.hasEVCharging ? '⚡ Yes' : '—' }}</td>
+            <td>
+              <span class="badge"
+                [class.active]="l.status === 'ACTIVE'"
+                [class.inactive]="l.status === 'INACTIVE'">
+                {{ l.status }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm green"
+                  *ngIf="l.status !== 'ACTIVE'"
+                  (click)="activateLot(l.lotId)">
+                  Active
+                </button>
+                <button class="btn-sm red"
+                  *ngIf="l.status === 'ACTIVE'"
+                  (click)="closeLot(l.lotId)">
+                  Close
+                </button>
+              </div>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm green"
+                  *ngIf="l.status !== 'ACTIVE'"
+                  (click)="approveLot(l.lotId)">
+                  Approve
+                </button>
+                <button class="btn-sm red"
+                  *ngIf="l.status === 'ACTIVE'"
+                  (click)="rejectLot(l.lotId)">
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty" *ngIf="filteredLots.length === 0">
+        <p>No lots found.</p>
+      </div>
+    </div>
+
+  </main>
+</div>

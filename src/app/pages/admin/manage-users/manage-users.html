@@ -1,0 +1,131 @@
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">ParkEase</div>
+      <nav>
+        <a routerLink="/admin/dashboard" class="nav-item">Dashboard</a>
+        <a routerLink="/admin/users" class="nav-item active">Manage Users</a>
+        <a routerLink="/admin/lots" class="nav-item">Manage Lots</a>
+        <a routerLink="/admin/bookings" class="nav-item">All Bookings</a>
+        <a routerLink="/admin/payments" class="nav-item">Payments</a>
+      </nav>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="avatar">{{ adminName?.charAt(0) | uppercase }}</div>
+        <div>
+          <div class="user-name">{{ adminName }}</div>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+      <a routerLink="/login" class="logout">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="topbar">
+      <h1>Manage Users</h1>
+      <button class="btn-refresh" (click)="loadUsers()">🔄 Refresh</button>
+    </div>
+
+    <!-- SEARCH + FILTER -->
+    <div class="toolbar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search by name, email or phone..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+      />
+      <div class="role-filters">
+        <button
+          *ngFor="let r of roles"
+          class="filter-btn"
+          [class.active]="selectedRole === r"
+          (click)="filterByRole(r)">
+          {{ r }}
+        </button>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <div class="loading" *ngIf="isLoading">Loading users...</div>
+
+    <!-- TABLE -->
+    <div class="card" *ngIf="!isLoading">
+      <div class="card-header">
+        <h2>All Users</h2>
+        <span class="count">{{ filteredUsers.length }} users</span>
+      </div>
+
+      <table *ngIf="filteredUsers.length > 0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Joined</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of filteredUsers">
+            <td class="id-col">#{{ u.userId }}</td>
+            <td>
+              <div class="user-cell">
+                <div class="mini-avatar">{{ u.fullName?.charAt(0) | uppercase }}</div>
+                <strong>{{ u.fullName }}</strong>
+              </div>
+            </td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.phone || '—' }}</td>
+            <td>
+              <span class="badge role"
+                [class.driver]="u.role === 'DRIVER'"
+                [class.manager]="u.role === 'MANAGER'"
+                [class.admin]="u.role === 'ADMIN'">
+                {{ u.role }}
+              </span>
+            </td>
+            <td>
+              <span class="badge"
+                [class.active]="u.status === 'ACTIVE'"
+                [class.inactive]="u.status === 'INACTIVE'">
+                {{ u.status || 'ACTIVE' }}
+              </span>
+            </td>
+            <td class="date-col">
+              {{ u.createdAt ? (u.createdAt | date:'dd MMM yyyy') : '—' }}
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-sm"
+                  [class.yellow]="u.status === 'ACTIVE'"
+                  [class.green]="u.status !== 'ACTIVE'"
+                  (click)="toggleUserStatus(u)">
+                  {{ u.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
+                </button>
+                <button class="btn-sm red"
+                  (click)="deleteUser(u.userId)">
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty" *ngIf="filteredUsers.length === 0">
+        <p>No users found.</p>
+      </div>
+    </div>
+
+  </main>
+</div>

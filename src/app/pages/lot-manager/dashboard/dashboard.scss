@@ -22,7 +22,7 @@
 
   .nav-item {
     display: block; padding: 0.6rem 0.8rem;
-    border-radius: 8px; color: #6b7280;
+    border-radius: 8px; color: #374151;
     text-decoration: none; font-size: 0.9rem; transition: all 0.2s;
     &:hover { background: #f3f4f6; color: #1a1a2e; }
     &.active { background: #f0fdf4; color: #16a34a; font-weight: 600; }
@@ -41,9 +41,9 @@
     .user-role { font-size: 0.75rem; color: #16a34a; }
   }
   .logout { display: block; padding: 0.5rem 0.8rem;
-    color: #6b7280; font-size: 0.85rem; text-decoration: none;
+    color: #374151; font-size: 0.85rem; text-decoration: none;
     border-radius: 8px;
-    &:hover { color: #ef4444; background: #fef2f2; } }
+    &:hover { color: #991b1b; background: #fef2f2; } }
 }
 
 .main { flex: 1; margin-left: 200px; padding: 2rem; }
@@ -69,7 +69,7 @@
     border-radius: 10px; padding: 1.2rem;
     .stat-value { font-size: 1.6rem; font-weight: 700;
       color: #1a1a2e; margin-bottom: 0.3rem; }
-    .stat-label { font-size: 0.82rem; color: #6b7280; } }
+    .stat-label { font-size: 0.82rem; color: #374151; } }
 }
 
 .card {
@@ -79,7 +79,7 @@
     display: flex; justify-content: space-between;
     align-items: center; margin-bottom: 1.2rem;
     h2 { font-size: 1rem; font-weight: 600; color: #1a1a2e; }
-    .view-all { color: #6b7280; font-size: 0.85rem; text-decoration: none;
+    .view-all { color: #374151; font-size: 0.85rem; text-decoration: none;
       &:hover { color: #16a34a; } }
   }
 }
@@ -100,20 +100,20 @@
 
 table {
   width: 100%; border-collapse: collapse;
-  th { text-align: left; font-size: 0.8rem; color: #6b7280;
+  th { text-align: left; font-size: 0.8rem; color: #374151;
     font-weight: 600; padding: 0.6rem 1rem;
     border-bottom: 1px solid #e5e7eb; }
   td { padding: 0.8rem 1rem; font-size: 0.875rem;
     border-bottom: 1px solid #f3f4f6; color: #374151; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #f9fafb; }
-  .booking-id { color: #6b7280; font-size: 0.82rem; }
+  .booking-id { color: #374151; font-size: 0.82rem; }
 }
 
 .badge {
   padding: 0.25rem 0.7rem; border-radius: 20px;
   font-size: 0.78rem; font-weight: 600;
-  &.active { background: #d1fae5; color: #065f46; }
+  &.active { background: #d1fae5; color: #064e3b; }
   &.completed { background: #e0e7ff; color: #3730a3; }
   &.cancelled { background: #fee2e2; color: #991b1b; }
 }

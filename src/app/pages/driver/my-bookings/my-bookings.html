@@ -9,15 +9,16 @@
         <a routerLink="/driver/search" class="nav-item">Find Parking</a>
         <a routerLink="/driver/bookings" class="nav-item active">My Bookings</a>
         <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
-        <a routerLink="#" class="nav-item">Notifications</a>
-        <a routerLink="#" class="nav-item">Profile</a>
+        <a routerLink="/driver/payments" class="nav-item">Payments</a>
+        <a routerLink="/driver/notifications" class="nav-item">Notifications</a>
+        <a routerLink="/driver/profile" class="nav-item">Profile</a>
       </nav>
     </div>
     <div class="sidebar-bottom">
       <div class="user-info">
-        <div class="avatar">S</div>
+        <div class="avatar">{{ driverName?.charAt(0) | uppercase }}</div>
         <div>
-          <div class="user-name">Sachin</div>
+          <div class="user-name">{{ driverName }}</div>
           <div class="user-role">Driver</div>
         </div>
       </div>
@@ -33,29 +34,49 @@
       <a routerLink="/driver/search" class="btn-primary">+ New Booking</a>
     </div>
 
+    <!-- ERROR MESSAGE -->
+    <div class="error-msg" *ngIf="errorMessage">
+      ⚠️ {{ errorMessage }}
+    </div>
+
+    <!-- SUCCESS MESSAGE -->
+    <div class="success-msg" *ngIf="paymentSuccess">
+      ✅ Payment Successful!
+    </div>
+
     <!-- TABS -->
     <div class="tabs">
       <button class="tab" [class.active]="activeTab === 'ALL'"
               (click)="setTab('ALL')">All</button>
-      <button class="tab" [class.active]="activeTab === 'ACTIVE'"
-              (click)="setTab('ACTIVE')">Active</button>
+      <button class="tab" [class.active]="activeTab === 'CONFIRMED'"
+              (click)="setTab('CONFIRMED')">Confirmed</button>
       <button class="tab" [class.active]="activeTab === 'COMPLETED'"
               (click)="setTab('COMPLETED')">Completed</button>
       <button class="tab" [class.active]="activeTab === 'CANCELLED'"
               (click)="setTab('CANCELLED')">Cancelled</button>
     </div>
 
+    <!-- LOADING -->
+    <div class="card" *ngIf="isLoading">
+      <div class="loading">Loading bookings...</div>
+    </div>
+
     <!-- BOOKINGS TABLE -->
-    <div class="card">
-      <table>
+    <div class="card" *ngIf="!isLoading">
+      <div class="card-header">
+        <h2>My Bookings</h2>
+        <span class="count">{{ filteredBookings.length }} records</span>
+      </div>
+
+      <table *ngIf="filteredBookings.length > 0">
         <thead>
           <tr>
             <th>Booking ID</th>
             <th>Parking Lot</th>
             <th>Spot</th>
             <th>Vehicle</th>
-            <th>Date</th>
-            <th>Time</th>
+            <th>Start Time</th>
+            <th>End Time</th>
             <th>Amount</th>
             <th>Status</th>
             <th>Action</th>
@@ -63,35 +84,68 @@
         </thead>
         <tbody>
           <tr *ngFor="let b of filteredBookings">
-            <td class="id-col">{{ b.id }}</td>
-            <td>{{ b.lot }}</td>
-            <td>{{ b.spot }}</td>
-            <td class="id-col">{{ b.vehicle }}</td>
-            <td>{{ b.date }}</td>
-            <td>{{ b.startTime }} - {{ b.endTime }}</td>
-            <td><strong>{{ b.amount }}</strong></td>
+            <td class="id-col">#{{ b.bookingId }}</td>
+            <td>{{ b.displayLot }}</td>
+            <td>{{ b.displaySpot }}</td>
+            <td>{{ b.displayVehicle }}</td>
+            <td>{{ b.startTimeFormatted }}</td>
+            <td>{{ b.endTimeFormatted }}</td>
+            <td><strong>{{ b.displayAmount }}</strong></td>
             <td>
               <span class="badge"
-                    [class.active]="b.status === 'ACTIVE'"
+                    [class.confirmed]="b.status === 'CONFIRMED'"
                     [class.completed]="b.status === 'COMPLETED'"
-                    [class.cancelled]="b.status === 'CANCELLED'">
+                    [class.cancelled]="b.status === 'CANCELLED'"
+                    [class.pending]="b.status === 'PENDING'"
+                    [class.active]="b.status === 'ACTIVE'">
                 {{ b.status }}
               </span>
             </td>
             <td>
               <div class="action-btns">
+
+                <!-- PENDING — Pay Now + Cancel -->
                 <button class="btn-sm blue"
-                        *ngIf="b.status === 'ACTIVE'">
+                        *ngIf="b.status === 'PENDING'"
+                        (click)="openPayment(b)">
+                  💳 Pay Now
+                </button>
+                <button class="btn-sm red"
+                        *ngIf="b.status === 'PENDING'"
+                        (click)="cancelBooking(b.bookingId)">
+                  Cancel
+                </button>
+
+                <!-- CONFIRMED — Check In + Cancel -->
+                <button class="btn-sm green"
+                        *ngIf="b.status === 'CONFIRMED'"
+                        (click)="checkIn(b.bookingId)">
                   Check In
                 </button>
                 <button class="btn-sm red"
-                        *ngIf="b.status === 'ACTIVE'">
+                        *ngIf="b.status === 'CONFIRMED'"
+                        (click)="cancelBooking(b.bookingId)">
                   Cancel
                 </button>
+
+                <!-- ACTIVE — Check Out -->
+                <button class="btn-sm orange"
+                        *ngIf="b.status === 'ACTIVE'"
+                        (click)="checkOut(b)">
+                  Check Out
+                </button>
+
+                <!-- COMPLETED — Receipt -->
                 <button class="btn-sm grey"
-                        *ngIf="b.status === 'COMPLETED'">
+                        *ngIf="b.status === 'COMPLETED'"
+                        (click)="printReceipt(b)">
                   Receipt
                 </button>
+
+                <!-- CANCELLED -->
+                <span *ngIf="b.status === 'CANCELLED'"
+                      class="no-action">—</span>
+
               </div>
             </td>
           </tr>
@@ -106,4 +160,5 @@
     </div>
 
   </main>
+
 </div>

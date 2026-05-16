@@ -5,17 +5,18 @@
     <div class="sidebar-top">
       <div class="logo">ParkEase</div>
       <nav>
-        <a routerLink="/driver/dashboard" class="nav-item active">Dashboard</a>
-        <a routerLink="/driver/search" class="nav-item">Find Parking</a>
-        <a routerLink="/driver/bookings" class="nav-item">My Bookings</a>
-        <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
-        <a routerLink="#" class="nav-item">Notifications</a>
-        <a routerLink="#" class="nav-item">Profile</a>
-      </nav>
+  <a routerLink="/driver/dashboard" class="nav-item active">Dashboard</a>
+  <a routerLink="/driver/search" class="nav-item">Find Parking</a>
+  <a routerLink="/driver/bookings" class="nav-item">My Bookings</a>
+  <a routerLink="/driver/vehicles" class="nav-item">My Vehicles</a>
+  <a routerLink="/driver/payments" class="nav-item">Payments</a>
+  <a routerLink="/driver/notifications" class="nav-item">Notifications</a>
+  <a routerLink="/driver/profile" class="nav-item">Profile</a>
+</nav>
     </div>
     <div class="sidebar-bottom">
       <div class="user-info">
-        <div class="avatar">{{ driverName[0] }}</div>
+        <div class="avatar">{{ driverName?.charAt(0) | uppercase }}</div>
         <div>
           <div class="user-name">{{ driverName }}</div>
           <div class="user-role">Driver</div>
@@ -47,11 +48,12 @@
         <h2>Recent Bookings</h2>
         <a routerLink="/driver/bookings" class="view-all">View all</a>
       </div>
-      <table>
+
+      <table *ngIf="recentBookings.length > 0">
         <thead>
           <tr>
             <th>Booking ID</th>
-            <th>Parking Lot</th>
+            <th>Lot ID</th>
             <th>Date</th>
             <th>Amount</th>
             <th>Status</th>
@@ -59,13 +61,13 @@
         </thead>
         <tbody>
           <tr *ngFor="let b of recentBookings">
-            <td class="booking-id">{{ b.id }}</td>
-            <td>{{ b.lot }}</td>
-            <td>{{ b.date }}</td>
-            <td>{{ b.amount }}</td>
+            <td class="booking-id">{{ b.bookingId }}</td>
+            <td>Lot #{{ b.lotId }}</td>
+            <td>{{ b.startTime | date:'dd MMM yyyy' }}</td>
+            <td>{{ b.totalAmount ? '₹' + b.totalAmount : 'N/A' }}</td>
             <td>
               <span class="badge"
-                    [class.active]="b.status === 'ACTIVE'"
+                    [class.active]="b.status === 'CONFIRMED' || b.status === 'ACTIVE'"
                     [class.completed]="b.status === 'COMPLETED'"
                     [class.cancelled]="b.status === 'CANCELLED'">
                 {{ b.status }}
@@ -74,6 +76,10 @@
           </tr>
         </tbody>
       </table>
+
+      <div class="empty" *ngIf="recentBookings.length === 0">
+        <p>No bookings yet. <a routerLink="/driver/search">Find Parking</a></p>
+      </div>
     </div>
 
   </main>
