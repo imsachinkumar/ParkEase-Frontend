@@ -55,10 +55,8 @@
 |-----------|---------|---------|
 | Angular | 17 | Frontend Framework |
 | TypeScript | 5.x | Language |
-| RxJS | 7.x | Reactive Programming |
 | Angular Router | 17 | Client-side Routing |
 | Angular Forms | 17 | Form Handling |
-| DM Sans | — | Typography |
 | SCSS | — | Styling |
 
 ---
@@ -92,10 +90,6 @@ npm install
 ```bash
 ng serve
 ```
-
-App will be available at: `http://localhost:4200`
-
-> ⚠️ Make sure ParkEase Backend is running on `http://localhost:8090`
 
 ---
 
@@ -154,7 +148,7 @@ parkease-frontend/
 | **MANAGER** | `/manager/dashboard` | Manager pages only |
 | **ADMIN** | `/admin/dashboard` | All pages |
 
-> ⚠️ Admin registration is disabled — only DRIVER and MANAGER can register.
+>  Admin registration is disabled — only DRIVER and MANAGER can register.
 
 ---
 
@@ -196,147 +190,7 @@ parkease-frontend/
 | `/admin/bookings` | All Bookings |
 | `/admin/payments` | Payments |
 
----
-
-## 🔗 API Integration
-
-All API calls go through `src/app/services/api.ts`:
-
-```typescript
-private BASE_URL = 'http://localhost:8090/web';
-```
-
-Key API methods:
-
-```typescript
-// Auth
-login(data)
-register(data)
-
-// Parking Lots
-getAllLots()
-searchLots(city)
-createLot(data)
-
-// Bookings
-createBooking(data)
-getMyBookings(userId)
-cancelBooking(bookingId)
-
-// Payments
-createPayment(data)
-getMyPayments(userId)
-processPayment(paymentId)
-
-// Vehicles
-getMyVehicles(ownerId)
-registerVehicle(data)
-deleteVehicle(vehicleId)
-```
-
----
-
-## ⚙️ Environment Configuration
-
-API Base URL is configured in `src/app/services/api.ts`:
-
-```typescript
-// Development
-private BASE_URL = 'http://localhost:8090/web';
-
-// Production (update before deploying)
-private BASE_URL = 'https://your-backend-url.com/web';
-```
-
----
-
-## 📊 SonarQube Analysis
-
-Code quality analysis using SonarQube:
-
-### Setup
-
-```bash
-# Install scanner
-npm install -g sonarqube-scanner --force
-
-# Run SonarQube (Docker)
-docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
-```
-
-### sonar-project.properties
-
-```properties
-sonar.projectKey=parkease-frontend
-sonar.projectName=ParkEase Frontend
-sonar.sources=src
-sonar.host.url=http://localhost:9000
-sonar.token=your_token_here
-sonar.sourceEncoding=UTF-8
-sonar.exclusions=**/node_modules/**,**/*.spec.ts,**/dist/**
-sonar.scanner.sonarcloud=false
-```
-
-### Run Analysis
-
-```bash
-sonar-scanner
-```
-
-Dashboard: `http://localhost:9000/dashboard?id=parkease-frontend`
-
----
-
-## 🏗️ Build for Production
-
-```bash
-# Production build
-ng build --configuration production
-
-# Output will be in dist/parkease-frontend/
-```
-
----
-
-## 🐳 Docker Deployment
-
-```dockerfile
-FROM node:18-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build --prod
-
-FROM nginx:alpine
-COPY --from=build /app/dist/parkease-frontend/browser /usr/share/nginx/html
-EXPOSE 80
-```
-
-```bash
-# Build Docker image
-docker build -t parkease-frontend .
-
-# Run container
-docker run -d -p 80:80 parkease-frontend
-```
-
----
-
-## 🎨 Design System
-
-| Element | Value |
-|---------|-------|
-| Primary Color | `#1a1a2e` |
-| Accent Color | `#2563eb` |
-| Success Color | `#16a34a` |
-| Error Color | `#dc2626` |
-| Font Family | DM Sans |
-| Border Radius | 8px / 12px |
-
----
-
-## 📞 Contact
+:
 
 **Developer:** Sachin Kumar  
 **GitHub:** [@imsachinkumar](https://github.com/imsachinkumar)
